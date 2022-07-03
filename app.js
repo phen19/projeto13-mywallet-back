@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
 import { logIn, signUp } from "./controllers/authController.js";
-import { entryIn, entryOut, getEntries } from "./controllers/entryController.js";
+import { entryIn, entryOut, getEntries, deleteEntry } from "./controllers/entryController.js";
 
 
 dotenv.config();
@@ -20,6 +20,7 @@ server.post("/login", logIn);
 server.post("/entryin", entryIn)
 server.post("/entryout", entryOut)
 server.get("/entries", getEntries)
+server.delete("/entries/:id", deleteEntry)
 
 
 server.listen(process.env.PORT, () => {
