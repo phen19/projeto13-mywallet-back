@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { v4 as uuid} from "uuid";
 import { db } from "../database/db.js";
 import joi from "joi";
+import { stripHtml } from "string-strip-html";
 
 export async function signUp (req, res){
     const registerSchema = joi.object({
@@ -59,7 +60,9 @@ export async function logIn(req, res){
                 userId: user._id,
                 token
             })
-            res.send(token)
+            user.token= token
+            delete user.password
+            res.send(user)
         }else{
             res.status(401).send("Email e/ou senha incorretos")
         }
