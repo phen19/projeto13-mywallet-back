@@ -16,19 +16,21 @@ export async function signUp (req, res){
     const passwordHash = bcrypt.hashSync(user.password, 10);
     const validation = registerSchema.validate(user,{abortEarly: false});
     user.name = stripHtml(user.name).result.trim()
+
     if(validation.error){
         res.status(422).send(validation.error.details.map(item => item.message))
         return
     }
     delete user.confirmPassword
+
     try {
         const existingName = await db.collection("users").findOne({name: user.name})
         if (existingName) {
             return res.sendStatus(409);
           }
-      
+        
           
-        await db.collection("users").insertOne({...user, password:passwordHash})
+        await db.collection("users").insertOne({...user, password:passwordHash, balance: 0})
         res.sendStatus(201)
     } catch(error){
         console.error(error);
