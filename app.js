@@ -1,8 +1,6 @@
 import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
-import { logIn, signUp } from "./controllers/authController.js";
-import { entryIn, entryOut, getEntries, deleteEntry } from "./controllers/entryController.js";
 import authRouter from "./routes/authRouter.js"
 import entryRouter from "./routes/entryRouter.js"
 
