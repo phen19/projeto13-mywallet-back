@@ -1,73 +1,25 @@
-import bcrypt from "bcrypt";
-import { v4 as uuid} from "uuid";
 import { db, objectId } from "../database/db.js";
-import joi from "joi";
-import { stripHtml } from "string-strip-html";
-import dayjs from "dayjs";
+
 
 export async function entryIn(req, res){
   
-    const entry = req.body;
-    const { authorization } = req.headers;
-    const token = authorization?.replace('Bearer ', '');
-    const entrySchema = joi.object({
-      amount: joi.number().precision(2).positive().required().options({convert: false}),
-      description: joi.string().required()
-    });
-  
-    const { error } = entrySchema.validate(entry);
-  
-    if (error) {
-      return res.status(422).send(error.details.map(item => item.message));
-    }
-  
-    entry.day = Date.now()
-    const session = await db.collection('sessions').findOne({token: token});
-  
-    if (!session) {
-      return res.status(401).send("Sessão não encontrada/expirada");
-    }
+    const entry = res.locals.entry
     
-    await db.collection('entries').insertOne({ ...entry, userId: session.userId, day: dayjs(entry.day).format("DD/MM") });
+    await db.collection('entries').insertOne({...entry});
     res.status(201).send('Entrada salva com sucesso');
   }
 
 export async function entryOut(req, res){
   
-    const entry = req.body;
-    const { authorization } = req.headers;
-    const token = authorization?.replace('Bearer ', '');
-    const entrySchema = joi.object({
-      amount: joi.number().precision(2).negative().required().options({convert: false}),
-      description: joi.string().required()
-    });
-  
-    const { error } = entrySchema.validate(entry);
-  
-    if (error) {
-      return res.status(422).send(error.details.map(item => item.message));
-    }
-    entry.day = Date.now()
-    const session = await db.collection('sessions').findOne({token: token});
-  
-    if (!session) {
-      return res.status(401).send("Sessão não encontrada/expirada");
-    }
+    const entry = res.locals.entry;
     
-    await db.collection('entries').insertOne({ ...entry, userId: session.userId, day: dayjs(entry.day).format("DD/MM") });
+    await db.collection('entries').insertOne({ ...entry});
     res.status(201).send('Entrada salva com sucesso');
   }
 
 export async function getEntries(req, res){
-    const { authorization } = req.headers;
-    const token = authorization?.replace('Bearer ', '');
-  
-    const session = await db.collection('sessions').findOne({ token: token });
-  
-    if (!session) {
-      return res.sendStatus(401).send("Sessão não encontrada/expirada");
-    }
-  
+    const session = res.locals.session;    
+
     let balance = 0;
 
     const entries = await db

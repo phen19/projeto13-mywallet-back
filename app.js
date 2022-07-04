@@ -3,7 +3,8 @@ import cors from "cors";
 import express from "express";
 import { logIn, signUp } from "./controllers/authController.js";
 import { entryIn, entryOut, getEntries, deleteEntry } from "./controllers/entryController.js";
-
+import authRouter from "./routes/authRouter.js"
+import entryRouter from "./routes/entryRouter.js"
 
 dotenv.config();
 
@@ -13,16 +14,13 @@ server.use(express.json());
 
 
 //Auth routes
-server.post("/register", signUp)
-server.post("/login", logIn);
-
-//Entry routes
-server.post("/entryin", entryIn)
-server.post("/entryout", entryOut)
-server.get("/entries", getEntries)
-server.delete("/entries/:id", deleteEntry)
+server.use(authRouter);
+server.use(entryRouter);
 
 
-server.listen(process.env.PORT, () => {
-    console.log(`Server is litening on port ${process.env.PORT}.`);
+const PORT = process.env.PORT || 5001
+
+
+server.listen(PORT, () => {
+    console.log(`Server is litening on port ${PORT}.`);
 });
